@@ -91,6 +91,13 @@
   const route = useRoute();
   const router = useRouter();
   const thankyoupage = ref(false);
+  const props = defineProps({
+    form_page: Object,
+    bgColor:String,
+    textColor:String,
+    buttonColor:String,
+    buttonTextColor:String,
+    });
 const form = reactive({
   name: '',
   phone: '',
@@ -163,6 +170,7 @@ const handleSubmit = async () => {
     formData.append('name', form.name);
     formData.append('phone', form.phone);
     formData.append('email', form.email);
+    formData.append('answers',localStorage.getItem('answers'));
     // Simulate API call
     const response = await fetch(import.meta.env.VITE_BASE_URL+'api/submitForm/'+route.params.uuid, {
       method: 'POST',
@@ -197,9 +205,7 @@ const resetForm = () => {
     errors[key] = '';
   });
 };
-  const props = defineProps({
-    form_page: Object, // Updated to Object since it's not an array in your example JSON.
-  });
+ 
   
   // State
   const isMobile = ref(false);

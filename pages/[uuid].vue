@@ -1,8 +1,23 @@
 <template>
     <QuestionComponents  v-if="questionPage=='true'" :questions="questions"
-    :title="title" :progressBarStyle="progressBarStyle" :next_question_text="next_question_text" :next_to_form="next_to_form" :buttonStyle="buttonStyle"/>
-    <FormPageComponents v-else-if="formPage=='true'" :form_page="form_page" />
-    <div class="startPage" v-else>
+    :title="title" 
+    :progressBarStyle="progressBarStyle" 
+    :next_question_text="next_question_text" 
+    :next_to_form="next_to_form" 
+    :buttonStyle="buttonStyle"
+    :bgColor="bgColor"
+    :textColor="textColor"
+    :buttonColor="buttonColor"
+    :buttonTextColor="buttonTextColor"
+    />
+    <FormPageComponents v-else-if="formPage=='true'" 
+    :form_page="form_page"
+    :bgColor="bgColor"
+    :textColor="textColor"
+    :buttonColor="buttonColor"
+    :buttonTextColor="buttonTextColor"
+     />
+    <div class="startPage" :style="{backgroundColor: bgColor}" v-else> 
       <div class="startPage__content" :class="{reverse:design_alignment==2}">
         <template v-if="!isMobile && hero_image">
           <div class="hero"  :class="{bg:design_type==1}" :style="{ backgroundImage: `url(${hero_image})` }"></div>
@@ -10,10 +25,10 @@
         <template v-if="isMobile && hero_image_mobi">
           <div class="hero"  :class="{bg:design_type==1}" :style="{ backgroundImage: `url(${hero_image_mobi})` }"></div>
         </template>
-        <div class="bg-overlay" v-if="!isMobile && (design_type==1 || hero_image)" :class="{right:design_alignment==2}"></div>
+        <div class="bg-overlay" v-if="!isMobile && (design_type==1 && hero_image)" :class="{right:design_alignment==2}"></div>
         <div class="hiddenElement" v-if="design_type==1 || hero_image" ></div>
-        <div class="content" :class="{fullwidth:hero_image==null, fullwidth:isMobile && hero_image_mobi==null, bg:design_type==1}">
-          <div class="content--header" v-if="slogan_text || logo">
+        <div class="content" :style="{backgroundColor: bgColor, color: textColor}"  :class="{fullwidth:hero_image==null, fullwidth:isMobile && hero_image_mobi==null, bg:design_type==1}">
+          <div class="content--header"  v-if="slogan_text || logo">
             <div class="logo">
               <img
                 :src="logo"
@@ -24,14 +39,14 @@
           </div>
           <div class="content--body">
             <div class="content--body__txt">
-              <h1>{{ title }}</h1>
-              <h2>{{ title_secondary }}</h2>
-              <div class="btn btn-primary" @click="changeRouteParams">{{button_text}}</div>
+              <h1 :style="{color: textColor}">{{ title }}</h1>
+              <h2 :style="{color: textColor}">{{ title_secondary }}</h2>
+              <div class="btn btn-primary" @click="changeRouteParams" :style="{color: buttonTextColor, background: buttonColor, borderColor: buttonColor}">{{button_text}}</div>
             </div>
           </div>
           <div class="content--footer">
             <div class="content--footer__txt">
-              <div class="phone">{{ phoneNumber }}</div>
+              <div class="phone"><a :style="{color: textColor}" :href="`tel:${phoneNumber}`">{{ phoneNumber }}</a> </div>
               <div class="company">{{companyName_text}}</div>
             </div>
             
@@ -60,12 +75,16 @@
   const hero_image = ref('');
   const hero_image_mobi = ref('');
   const logo = ref('');
+  const bgColor = ref('#fff');
+  const textColor = ref('#020202');
+  const buttonColor = ref('#CB0000');
+  const buttonTextColor = ref('#fff');
   const meta_title = ref('');
   const meta_description = ref('');
   const meta_favicon = ref('');
   const meta_image = ref('');
   const isMobile = ref(false);
-  const questions  = ref(null);
+  const questions  = ref([]);
   const questionPage = ref(route.query.question);
   const formPage = ref(route.query.form);
   const progressBarStyle = ref(0);
@@ -77,6 +96,30 @@
   const next_question_text  = ref(null);
   const next_to_form  = ref(null);
   // Define the async function to fetch data
+  const handleVisit = async () => {
+    
+    try {
+      
+      const formData = new FormData();
+      
+      // Simulate API call
+      const response = await fetch(import.meta.env.VITE_BASE_URL+'api/visitlog/'+route.params.uuid, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+        },
+        body: formData,
+      });
+
+      if (response.status === 200) {
+       
+      }
+    } catch (error) {
+      console.error('Unexpected Error:', error);
+      // alert('Произошла ошибка при отправке формы.');
+    }
+    // Submit form data here...
+  };
   const asyncData = async () => {
    
     try {
@@ -90,7 +133,10 @@
           },
         }
       );
-     
+      if(data.value==null){
+        router.push('/404');
+        return;
+      }
       
       meta_title.value = data.value.meta_title || '';
       meta_description.value = data.value.meta_description;
@@ -101,8 +147,14 @@
       let startPage = data.value?.start_page;
       form_page.value = data.value?.form_page;
       design.value = data.value?.design;
-        console.log(data.value);
-      questions.value = data.value.questions;
+       
+      // questions.value = data.value.questions;
+      data.value.questions.forEach(question => {
+        if(!question.hidden){
+          questions.value.push(question);
+        }
+      });
+      
       if(startPage){
        
         title.value = startPage.title=='null'? null : startPage.title_secondary;
@@ -118,7 +170,12 @@
         logo.value = import.meta.env.VITE_BASE_URL+startPage.logo;
       }
       if(design){
+       
         
+        buttonColor.value = design.value.buttonColor;
+        buttonTextColor.value = design.value.buttonTextColor;
+        bgColor.value =  design.value.bgColor;
+        textColor.value = design.value.textColor;
         progressBarStyle.value = design.value.progressBarStyle;
         
         buttonStyle.value  =design.value.buttonStyle;
@@ -133,6 +190,7 @@
         // questionPage.value = false;
         
       }
+      handleVisit();
       
     } catch (error) {
       console.error('Ошибка:', error);
@@ -160,42 +218,42 @@
     title: meta_title || 'MarkQuiz',  // Dynamically set the title based on the fetched data
     meta: [
         {
-        name: 'description',
-        content: meta_description || '',
+          name: 'description',
+          content: meta_description || '',
         },
         // Open Graph meta tags (Facebook, LinkedIn, etc.)
         {
-        property: 'og:title',
-        content: meta_title || '',
+          property: 'og:title',
+          content: meta_title || '',
         },
         {
-        property: 'og:description',
-        content: meta_description || '',
+          property: 'og:description',
+          content: meta_description || '',
         },
         {
-        property: 'og:image',
-        content: meta_image || '/default-image.jpg',  // Fallback image
+          property: 'og:image',
+          content: meta_image || '/default-image.jpg',  // Fallback image
         },
         {
-        property: 'og:type',
-        content: 'website',
+          property: 'og:type',
+          content: 'website',
         },
         // Twitter Card meta tags
         {
-        name: 'twitter:title',
-        content: meta_title || '',
+          name: 'twitter:title',
+          content: meta_title || '',
         },
         {
-        name: 'twitter:description',
-        content: meta_description || '',
+          name: 'twitter:description',
+          content: meta_description || '',
         },
         {
-        name: 'twitter:image',
-        content: meta_image || '/default-image.jpg',  // Fallback image
+          name: 'twitter:image',
+          content: meta_image || '/default-image.jpg',  // Fallback image
         },
         {
-        name: 'twitter:card',
-        content: 'summary_large_image',  // Ensures a large image is shown on Twitter
+          name: 'twitter:card',
+          content: 'summary_large_image',  // Ensures a large image is shown on Twitter
         },
         // Favicon link
        
