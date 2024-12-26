@@ -1,7 +1,7 @@
 <template>
     <div class="questionPage" :style="{ backgroundColor: props.bgColor, color: props.textColor }">
         <div class="questionPage--header" :style="{ borderColor: hexToRgba(props.textColor, 0.2) }">
-            <h2 class="container--block">{{ props.title }}</h2>
+            <h2 class="container--block">{{ props.currentLocale=='ru'? props.title :  props.title_uz }}</h2>
         </div>
 
         <div class="questionPage--body">
@@ -10,7 +10,7 @@
                     v-for="(question, index) in questions" :key="question.id">
                     <template v-if="questionIndex === index">
                         <div class="question--title">
-                            <h3>{{ question.question }} </h3>
+                            <h3>{{ props.currentLocale=='ru'?  question.question :  question.question_uz }} </h3>
 
                         </div>
                         <div class="question--body">
@@ -42,10 +42,11 @@
                                             <!-- //filled hole -->
                                         </div>
                                         <div class="txt">
-                                            <p :style="{ color: textColor }">{{ answer.text == 'null' ? '' : answer.text }}
+                                            <p :style="{ color: textColor }">{{ answer.text == 'null' ? '' : props.currentLocale=='ru'? answer.text :answer.text_uz }}
                                             </p>
-                                            <small :style="{ color: textColor }">{{ answer.secondary_text == 'null' ? '' :
-                                                answer.secondary_text}}</small>
+                                            
+                                            <small  v-if="question.long_text" :style="{ color: textColor }">{{ answer.secondary_text == 'null' ? '' :
+                                               props.currentLocale=='ru'?  answer.secondary_text : answer.secondary_text_uz}}</small>
                                         </div>
                                     </div>
                                     <div class="answers__block--each"
@@ -111,7 +112,7 @@
                                         </div>
                                         <div class="txt withImage">
                                             <img :src="getImage(answer.image)" alt="">
-                                            <p :style="{ color: textColor }">{{ answer.text }}</p>
+                                            <p :style="{ color: textColor }">{{ props.currentLocale=='ru'? answer.text : answer.text_uz }}</p>
 
                                         </div>
 
@@ -150,7 +151,7 @@
                                 <div class="answers__block">
                                     <input type="text" class="comment"
                                         @focusout="handleClick(question, $event.target.value, false)"
-                                        :placeholder="question.answers[0].text == 'null' ? '' : question.answers[0].text">
+                                        :placeholder="question.answers[0].text == 'null' ? '' : props.currentLocale=='ru'?  question.answers[0].text :  question.answers[0].text_uz">
                                 </div>
 
 
@@ -173,8 +174,8 @@
 
                                         </div>
                                         <div class="stars__text">
-                                            <span>{{ question.answers[0].rank_text_min=='null'? '' :  question.answers[0].rank_text_min }}</span>
-                                            <span>{{ question.answers[0].rank_text_max=='null'? '' :  question.answers[0].rank_text_max }}</span>
+                                            <span>{{ question.answers[0].rank_text_min=='null'? '' :   props.currentLocale=='ru'?  question.answers[0].rank_text_min : question.answers[0].rank_text_min_uz }}</span>
+                                            <span>{{ question.answers[0].rank_text_max=='null'? '' :  props.currentLocale=='ru'?   question.answers[0].rank_text_max :  question.answers[0].rank_text_max_uz }}</span>
                                         </div>
                                     </div>
 
@@ -198,7 +199,7 @@
                                             @change="chooseAnswer(dropdownAnswers[questionIndex], question)">
                                             <option style="display:none" selected></option>
                                             <option v-for="(answer, index) in question.answers" :value="answer">{{
-                                                answer.text }}</option>
+                                               props.currentLocale=='ru'? answer.text :  answer.text_uz }}</option>
                                         </select>
                                     </div>
                                 </div>
@@ -311,6 +312,7 @@ import '@vuepic/vue-datepicker/dist/main.css'
 const props = defineProps({
     questions: Array,
     title: String,
+    title_uz: String,
     progressBarStyle: Number,
     buttonStyle: Number,
     next_question_text: String,
@@ -319,8 +321,8 @@ const props = defineProps({
     textColor: String,
     buttonColor: String,
     buttonTextColor: String,
+    currentLocale: String,
 });
-
 const route = useRoute();
 const router = useRouter();
 const date = ref();

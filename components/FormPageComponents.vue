@@ -9,12 +9,12 @@
         ></div>
         <div class="formPage__block--content">
             <div class="formPage__block--inside" :class="{centered:!form_page.hero_image}">
-                <h2>{{ form_page.title=='null'? '': form_page.title }}</h2>
-                <p>{{ form_page.title_secondary=='null'? '': form_page.title_secondary }}</p>
+                <h2>{{ form_page.title=='null'? '':  props.currentLocale=='ru'? form_page.title : form_page.title_uz}}</h2>
+                <p>{{ form_page.title_secondary=='null'? '':  props.currentLocale=='ru'?  form_page.title_secondary : form_page.title_secondary_uz }}</p>
                 <form @submit.prevent="validateForm">
                   <!-- Name Field -->
                   <label for="name" v-if="form_page.name">
-                    <span>Имя <span v-if="form_page.name_required">*</span></span>
+                    <span>{{ props.currentLocale=='ru'? 'Имя': 'Ism' }}  <span v-if="form_page.name_required">*</span></span>
                     <input class="form-control"
                       id="name" 
                       type="text" 
@@ -26,7 +26,7 @@
 
                   <!-- Phone Field -->
                   <label for="phone" v-if="form_page.phone">
-                    <span>Введите телефон <span v-if="form_page.phone_required">*</span></span>
+                    <span>{{ props.currentLocale=='ru'? 'Введите телефон ' : 'Telefon raqamingiz' }}<span v-if="form_page.phone_required">*</span></span>
                     <input 
                     class="form-control"
                       id="phone" 
@@ -39,7 +39,7 @@
 
                   <!-- Email Field -->
                   <label for="email" v-if="form_page.email">
-                    <span>Введите email <span v-if="form_page.email_required">*</span></span>
+                    <span>{{props.currentLocale=='ru'? 'Введите email' : 'Email kiritng'}} <span v-if="form_page.email_required">*</span></span>
                     <input 
                       id="email" 
                       type="email" 
@@ -51,7 +51,7 @@
                   </label>
 
                   <!-- Submit Button -->
-                  <div class="btn btn-primary" @click="validateForm">Отправить</div>
+                  <div class="btn btn-primary" @click="validateForm">{{props.currentLocale=='ru'? 'Отправить' :'Yuborish' }}</div>
 
                   <!-- Consent Checkbox -->
                   <label>
@@ -97,6 +97,7 @@
     textColor:String,
     buttonColor:String,
     buttonTextColor:String,
+    currentLocale: String,
     });
 const form = reactive({
   name: '',
