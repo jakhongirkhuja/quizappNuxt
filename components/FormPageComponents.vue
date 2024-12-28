@@ -163,7 +163,6 @@ const clearError = (field) => {
 };
 
 const handleSubmit = async () => {
-  alert('Форма успешно отправлена!');
   try {
     console.log('Submitting Form:', form);
 

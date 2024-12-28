@@ -30,7 +30,7 @@
         </template>
         <div class="bg-overlay" v-if="!isMobile && (design_type==1 && hero_image)" :class="{right:design_alignment==2}"></div>
         <div class="hiddenElement" v-if="design_type==1 || hero_image" ></div>
-        <div class="content" :style="{backgroundColor: bgColor, color: textColor}"  :class="{fullwidth:hero_image==null, fullwidth:isMobile && hero_image_mobi==null, bg:design_type==1}">
+        <div class="content" :style="design_type === 0 ? { backgroundColor: bgColor, color: textColor } : null"  :class="{fullwidth:hero_image==null, fullwidth:isMobile && hero_image_mobi==null, bg:design_type==1}">
           <div class="content--header"  v-if="slogan_text || logo">
             <div class="logo">
               <img
@@ -42,8 +42,8 @@
           </div>
           <div class="content--body">
             <div class="content--body__txt">
-              <h1 :style="{color: textColor}">{{ currentLocale=='ru'?  title : title_uz }}</h1>
-              <h2 :style="{color: textColor}">{{ currentLocale=='ru'?  title_secondary : title_secondary_uz }}</h2>
+              <h1 :style="design_type === 0 ? {color: textColor} : null">{{ currentLocale=='ru'?  title : title_uz }}</h1>
+              <h2 :style="design_type === 0 ? {color: textColor} : null">{{ currentLocale=='ru'?  title_secondary : title_secondary_uz }}</h2>
               <div class="btn btn-primary" @click="changeRouteParams" :style="{color: buttonTextColor, background: buttonColor, borderColor: buttonColor}">{{currentLocale=='ru'?  button_text: button_text_uz}}</div>
             </div>
           </div>
@@ -116,7 +116,7 @@
   // Define the async function to fetch data
   
   const handleVisit = async () => {
-    
+    console.log('handle visit');
     try {
       
       const formData = new FormData();
@@ -156,7 +156,7 @@
         router.push('/404');
         return;
       }
-      
+      console.log(data);
       meta_title.value = data.value.meta_title || '';
       meta_description.value = data.value.meta_description;
       meta_favicon.value = import.meta.env.VITE_BASE_URL+data.value.meta_favicon;
@@ -216,7 +216,7 @@
         // questionPage.value = false;
         
       }
-      handleVisit();
+      
       
     } catch (error) {
       console.error('Ошибка:', error);
@@ -232,12 +232,13 @@
   
 };
   onMounted(() => {
+    handleVisit();
     checkIfMobile(); // Check on mount
     window.addEventListener('resize', checkIfMobile); // Update on window resize
     });
-  
+    asyncData();
   // Call the function when the component is mounted
-  asyncData();
+  
   
   // Set the meta tags dynamically
   useHead({
