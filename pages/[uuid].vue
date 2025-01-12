@@ -153,7 +153,8 @@
         }
       );
       if(data.value==null){
-        router.push('/404');
+        console.log(data);
+        // router.push('/404');
         return;
       }
       console.log(data);
@@ -242,7 +243,7 @@
   
   // Set the meta tags dynamically
   useHead({
-    title: meta_title || 'MarkQuiz',  // Dynamically set the title based on the fetched data
+    title: meta_title || 'QuizLink',  // Dynamically set the title based on the fetched data
     meta: [
         {
           name: 'description',

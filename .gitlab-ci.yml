@@ -1,0 +1,20 @@
+image: alpine:latest
+pages:  
+  stage: deploy  
+  before_script:
+  - npm -v
+  - pm2 status
+  script:
+  - cp -r -u * /var/www/all.qlink.uz
+  - cd /var/www/all.qlink.uz
+  - ls -la
+  - npm run build
+  - pm2 restart NuxtAppName
+  artifacts:
+    paths:
+    - ./*
+  only:
+  - main
+  # only:
+  #   - main
+
